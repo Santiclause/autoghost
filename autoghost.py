@@ -43,9 +43,14 @@ def identifycb(word, word_eol, userdata):
         c.command("msg nickserv identify " + c.get_info('nickserv'))
     return xchat.EAT_NONE
 
+def onconnectcb(word, word_eol, userdata):
+    c = xchat.get_context()
+    if c.get_info('nick') != xchat.get_prefs('irc_nick1'):
+        c.command('nick ' + xchat.get_prefs('irc_nick1'))
+
 xchat.hook_server("433", ghostcb) #server numeric for failed nick change
-                                  #AKA ERR_NICKNAMEINUSE
-xchat.hook_server("NOTICE", identifycb)
+xchat.hook_server("NOTICE", identifycb) #watch for nickserv warning to identify
+xchat.hook_server("2", onconnectcb) #server numeric sent when first connecting
 
 def unloadcb(userdata):
     xchat.prnt("{} unloaded.".format(__module_name__))
