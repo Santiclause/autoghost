@@ -19,7 +19,7 @@ def ghostcb(word, word_eol, userdata):
 def noticecb(word, word_eol, userdata):
     match = NICKPATTERN.match(word[0])
     matchtxt = 'Ghost with your nick has been killed.'
-    if not match or match.group(1) != 'NickServ':
+    if not match or xchat.nickcmp(match.group(1), 'NickServ') != 0:
         return xchat.EAT_NONE
     if word_eol[-2][1:] == 'Access denied.':
         xchat.unhook(userdata["hook"])
@@ -37,7 +37,7 @@ def identifycb(word, word_eol, userdata):
     c = xchat.get_context()
     match = NICKPATTERN.match(word[0])
     matchtxt = "This nickname is registered and protected."
-    if not match or match.group(1) != 'NickServ':
+    if not match or xchat.nickcmp(match.group(1), 'NickServ') != 0:
         return xchat.EAT_NONE
     if matchtxt in word_eol[0]:
         c.command("msg nickserv identify " + c.get_info('nickserv'))
@@ -45,7 +45,7 @@ def identifycb(word, word_eol, userdata):
 
 def onconnectcb(word, word_eol, userdata):
     c = xchat.get_context()
-    if c.get_info('nick') != xchat.get_prefs('irc_nick1'):
+    if xchat.nickcmp(c.get_info('nick'), xchat.get_prefs('irc_nick1')) != 0:
         c.command('nick ' + xchat.get_prefs('irc_nick1'))
 
 xchat.hook_server("433", ghostcb) #server numeric for failed nick change
